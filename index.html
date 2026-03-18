@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Files to Agents — PM & Designer Workshop</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface2: #22222f;
+    --border: #2e2e3e;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --pink: #f472b6;
+    --text: #e2e2f0;
+    --muted: #6b6b8a;
+    --code-bg: #12121a;
+  }
+
+  body {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--pink));
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* Nav */
+  #nav {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2rem;
+    padding: 0.5rem 1.2rem;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  #nav button {
+    background: none;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.4rem;
+    transition: background 0.2s;
+  }
+  #nav button:hover { background: var(--border); }
+  #nav button:disabled { color: var(--muted); cursor: default; }
+  #nav button:disabled:hover { background: none; }
+
+  #slide-counter {
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Slide container */
+  #slides {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 6rem 6rem;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    text-align: center;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  /* Slide types */
+  .slide-title { background: radial-gradient(ellipse at 60% 40%, #1e1040 0%, var(--bg) 70%); }
+  .slide-concept { background: var(--bg); }
+  .slide-discussion { background: radial-gradient(ellipse at 40% 60%, #0f2027 0%, var(--bg) 70%); }
+  .slide-action { background: radial-gradient(ellipse at 50% 50%, #1a0f2e 0%, var(--bg) 70%); }
+
+  /* Typography */
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .tag-section { background: rgba(124,106,247,0.15); color: var(--accent2); border: 1px solid rgba(124,106,247,0.3); }
+  .tag-discussion { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .tag-action { background: rgba(251,191,36,0.1); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+  .tag-terminal { background: rgba(244,114,182,0.1); color: var(--pink); border: 1px solid rgba(244,114,182,0.3); }
+
+  h1 { font-size: 3.2rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h2 { font-size: 2.2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1rem; }
+  h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--accent2); }
+
+  .subtitle { font-size: 1.2rem; color: var(--muted); max-width: 680px; line-height: 1.6; }
+  .body-text { font-size: 1.05rem; color: var(--text); max-width: 720px; line-height: 1.7; }
+  .large-quote {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    max-width: 760px;
+    font-style: italic;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    text-align: left;
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    width: 100%;
+    max-width: 720px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block .c-green { color: #34d399; }
+  .code-block .c-yellow { color: #fbbf24; }
+  .code-block .c-purple { color: #a78bfa; }
+  .code-block .c-pink { color: #f472b6; }
+  .code-block .c-blue { color: #60a5fa; }
+  .code-block .c-muted { color: #6b6b8a; }
+
+  /* Terminal block */
+  .terminal {
+    background: #0a0a0f;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    width: 100%;
+    max-width: 720px;
+    overflow: hidden;
+  }
+  .terminal-header {
+    background: var(--surface2);
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .terminal-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .terminal-body {
+    padding: 1.25rem 1.5rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    text-align: left;
+  }
+  .terminal-body .prompt { color: var(--green); }
+  .terminal-body .cmd { color: var(--text); }
+  .terminal-body .out { color: var(--muted); }
+  .terminal-body .comment { color: #4a4a6a; }
+
+  /* Cards */
+  .cards {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 880px;
+  }
+  .card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-align: left;
+  }
+  .card h4 { font-size: 0.85rem; font-weight: 600; color: var(--accent2); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .card p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+  .card .card-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+  /* Table */
+  .styled-table {
+    width: 100%;
+    max-width: 760px;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  .styled-table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(46,46,62,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table td:first-child { color: var(--accent2); font-weight: 600; }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 760px;
+  }
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+
+  /* Progress stages */
+  .stages { display: flex; flex-direction: column; gap: 0.6rem; max-width: 680px; width: 100%; }
+  .stage {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    text-align: left;
+  }
+  .stage-num {
+    min-width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .stage.current .stage-num { background: rgba(124,106,247,0.2); border-color: var(--accent); color: var(--accent2); }
+  .stage-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.15rem; }
+  .stage-desc { font-size: 0.8rem; color: var(--muted); }
+
+  /* Discussion */
+  .discussion-box {
+    background: rgba(52,211,153,0.05);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 1rem;
+    padding: 2rem 2.5rem;
+    max-width: 760px;
+    text-align: left;
+  }
+  .discussion-q {
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .discussion-hint { font-size: 0.9rem; color: var(--muted); }
+
+  /* Action list */
+  .action-list { list-style: none; max-width: 640px; width: 100%; text-align: left; }
+  .action-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(46,46,62,0.5);
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .action-list .check {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Agenda */
+  .agenda { display: flex; flex-direction: column; gap: 0.4rem; max-width: 620px; width: 100%; }
+  .agenda-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .agenda-item:hover { background: var(--surface); }
+  .agenda-time { color: var(--muted); font-size: 0.8rem; min-width: 80px; font-variant-numeric: tabular-nums; }
+  .agenda-title { flex: 1; }
+  .agenda-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+
+  /* Spacers */
+  .mt1 { margin-top: 0.5rem; }
+  .mt2 { margin-top: 1rem; }
+  .mt3 { margin-top: 1.5rem; }
+
+  /* Keyboard hint */
+  #keyboard-hint {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    z-index: 100;
+  }
+  kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.7rem;
+    font-family: inherit;
+  }
+
+  /* Section divider slides */
+  .section-number {
+    font-size: 6rem;
+    font-weight: 800;
+    color: rgba(124,106,247,0.08);
+    line-height: 1;
+    margin-bottom: -0.5rem;
+    letter-spacing: -0.05em;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="keyboard-hint"><kbd>←</kbd> <kbd>→</kbd> to navigate</div>
+
+<div id="slides">
+
+  <!-- 01 TITLE -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag tag-section">Squad Workshop · 2026</div>
+    <h1>From Files<br/>to Agents</h1>
+    <p class="subtitle mt2">How PMs and Designers shape product development<br/>through structured context in shared repositories</p>
+    <div class="cards mt3" style="max-width:560px">
+      <div class="card">
+        <div class="card-icon">⏱</div>
+        <h4>Duration</h4>
+        <p>1 hour, interactive</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <h4>Audience</h4>
+        <p>PMs & Designers</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>Goal</h4>
+        <p>Contribute context to repositories</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 AGENDA -->
+  <div class="slide slide-concept" data-index="1">
+    <div class="tag tag-section">Agenda</div>
+    <h2>What we'll cover</h2>
+    <div class="agenda mt3">
+      <div class="agenda-item">
+        <span class="agenda-time">0:00 – 0:05</span>
+        <div class="agenda-dot" style="background:var(--accent)"></div>
+        <span class="agenda-title">Framing — why this matters</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-time">0:05 – 0:20</span>
+        <div class="agenda-dot" style="background:var(--accent2)"></div>
+        <span class="agenda-title">Part 1 — Directories, projects, repositories</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-time">0:20 – 0:35</span>
+        <div class="agenda-dot" style="background:var(--green)"></div>
+        <span class="agenda-title">Part 2 — What PMs contribute</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-time">0:35 – 0:45</span>
+        <div class="agenda-dot" style="background:var(--pink)"></div>
+        <span class="agenda-title">Part 3 — What Designers contribute</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-time">0:45 – 0:55</span>
+        <div class="agenda-dot" style="background:var(--yellow)"></div>
+        <span class="agenda-title">Part 4 — The agentic squad</span>
+      </div>
+      <div class="agenda-item">
+        <span class="agenda-time">0:55 – 1:00</span>
+        <div class="agenda-dot"></div>
+        <span class="agenda-title">Wrap-up and next steps</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 FRAMING -->
+  <div class="slide slide-concept" data-index="2">
+    <div class="tag tag-section">Framing</div>
+    <h2>This is not a coding class</h2>
+    <p class="large-quote mt3">
+      "The work you already do — writing specs, documenting decisions,
+      capturing research — can become 10x more powerful
+      when it's structured in the right place."
+    </p>
+    <div class="cards mt3">
+      <div class="card">
+        <h4>The problem</h4>
+        <p>Engineers ask questions PMs already know the answer to. Context is scattered across Slack, Confluence, Figma, and people's heads.</p>
+      </div>
+      <div class="card">
+        <h4>The opportunity</h4>
+        <p>If PMs and Designers write context where engineers actually work, everyone ships faster — and agents can help automate the rest.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 KEY CONCEPTS -->
+  <div class="slide slide-concept" data-index="3">
+    <div class="tag tag-section">Before we start</div>
+    <h2>5 concepts to know</h2>
+    <div class="cards mt3" style="flex-wrap:wrap; max-width:900px; gap:0.75rem">
+      <div class="card" style="min-width:200px">
+        <div class="card-icon">🧠</div>
+        <h4>Model</h4>
+        <p>The AI brain — Claude, GPT, Gemini. It reads, reasons, and writes. Everything else extends what it can do.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: Claude reads your initiative file and understands the constraints.</p>
+      </div>
+      <div class="card" style="min-width:200px">
+        <div class="card-icon">🔧</div>
+        <h4>Tool</h4>
+        <p>An action an agent can take — read a file, run a terminal command, post to Slack, open a PR.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: The agent uses a tool to read <code style="background:var(--code-bg);padding:0 0.3rem;border-radius:3px;font-size:0.78rem">product/initiatives/cash-out.md</code> before validating a PR.</p>
+      </div>
+      <div class="card" style="min-width:200px">
+        <div class="card-icon">⚡</div>
+        <h4>Skill</h4>
+        <p>A reusable workflow you define. Like a playbook — encode how something should always be done, then anyone can invoke it.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: <code style="background:var(--code-bg);padding:0 0.3rem;border-radius:3px;font-size:0.78rem">/write-user-stories</code> reads your initiative and generates consistent stories every time.</p>
+      </div>
+      <div class="card" style="min-width:200px">
+        <div class="card-icon">🔌</div>
+        <h4>Plugin</h4>
+        <p>An integration that connects the agent to external systems — Jira, Slack, GitHub, Figma, Confluence.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: A Jira plugin lets the agent create tickets directly from your initiative file, no manual input needed.</p>
+      </div>
+      <div class="card" style="min-width:200px; border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.07)">
+        <div class="card-icon">🤖</div>
+        <h4 style="color:var(--accent2)">Agent</h4>
+        <p>The whole system in action — a model using tools, running skills, and calling plugins to complete a goal autonomously. <strong style="color:var(--text)">Built by engineers.</strong></p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">PMs and Designers don't build agents — they write the skills and context that make agents useful.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 HOW THEY RELATE -->
+  <div class="slide slide-concept" data-index="4">
+    <div class="tag tag-section">Before we start</div>
+    <h2>How they work together</h2>
+    <div class="code-block mt3" style="max-width:800px"><span class="c-muted">Who owns it?</span>
+
+<span class="c-green">  PM / Designer</span>  →  write context: initiative files, design decisions
+<span class="c-green">  PM / Designer</span>  →  build <span class="c-green">Skills</span>: reusable prompts that encode their thinking
+<span class="c-pink">       Engineer</span>  →  configure <span class="c-yellow">Tools</span>: read file, run command, check PR
+<span class="c-pink">       Engineer</span>  →  wire <span class="c-pink">Plugins</span>: Jira, Slack, GitHub, Figma
+<span class="c-purple">       Engineer</span>  →  build the <span class="c-purple">Agent</span>: assembles model + tools + skills + plugins
+<span class="c-muted">           All</span>  →  review output and improve context over time</div>
+    <p class="body-text mt3" style="color:var(--muted)">
+      PMs and Designers own the <strong style="color:var(--green)">context and skills</strong> —
+      the richer they are, the smarter the agent.<br/>
+      <strong style="color:var(--text)">Writing a good skill is a PM superpower.</strong>
+    </p>
+  </div>
+
+  <!-- PLUGIN VS SKILL: DISTINCTION -->
+  <div class="slide slide-concept" data-index="5a">
+    <div class="tag tag-section">Plugin vs Skill</div>
+    <h2>One sentence difference</h2>
+    <p class="large-quote mt3" style="font-size:1.35rem">
+      The <strong style="color:var(--green)">skill</strong> tells the agent <em>what to think.</em><br/>
+      The <strong style="color:var(--pink)">plugin</strong> tells the agent <em>where to go.</em>
+    </p>
+    <table class="styled-table mt3">
+      <thead><tr><th></th><th>Skill</th><th>Plugin</th></tr></thead>
+      <tbody>
+        <tr><td>What it is</td><td style="color:var(--text)">Logic the PM or Designer writes</td><td style="color:var(--text)">A door to an external system</td></tr>
+        <tr><td>Who creates it</td><td style="color:var(--green)">PM or Designer</td><td style="color:var(--muted)">Engineer</td></tr>
+        <tr><td>What it answers</td><td style="color:var(--text)"><em>What should this output contain?</em></td><td style="color:var(--text)"><em>Where does the agent go to act?</em></td></tr>
+        <tr><td>Without it</td><td style="color:var(--yellow)">Agent produces generic, inconsistent output</td><td style="color:var(--yellow)">Agent can't reach Figma, Jira, or Slack</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PLUGIN VS SKILL: SCREEN EXAMPLE -->
+  <div class="slide slide-concept" data-index="5b">
+    <div class="tag tag-section">Plugin vs Skill · Example</div>
+    <h2>Creating the Cash Out Confirmation screen</h2>
+    <div class="cards mt3" style="align-items:flex-start">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h4 style="color:var(--green)">Skill — written by the PM</h4>
+        <p style="margin-bottom:0.75rem">Encodes what every screen spec must contain:</p>
+        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.9rem;font-family:'SF Mono',monospace;font-size:0.78rem;line-height:1.7;color:var(--muted)">
+          <span style="color:var(--green)">/create-screen-spec</span><br/><br/>
+          Given an initiative file + screen name:<br/>
+          1. User goal on this screen<br/>
+          2. Entry points<br/>
+          3. Happy path<br/>
+          4. <span style="color:var(--yellow)">Error states — list all</span><br/>
+          5. Edge cases (offline, timeout)<br/>
+          6. Acceptance criteria<br/>
+          7. Open questions for designer
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <h4 style="color:var(--pink)">Plugins — configured by engineers</h4>
+        <p style="margin-bottom:0.75rem">Give the agent access to external systems:</p>
+        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.9rem;font-family:'SF Mono',monospace;font-size:0.78rem;line-height:1.9;color:var(--muted)">
+          <span style="color:var(--pink)">Figma plugin</span>  → read component library<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;check what already exists<br/><br/>
+          <span style="color:var(--pink)">Jira plugin</span>&nbsp;&nbsp;&nbsp;→ create engineering ticket<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attach spec automatically<br/><br/>
+          <span style="color:var(--pink)">Slack plugin</span>&nbsp;&nbsp;→ notify designer when ready
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLUGIN VS SKILL: END-TO-END FLOW -->
+  <div class="slide slide-concept" data-index="5c">
+    <div class="tag tag-section">Plugin vs Skill · End-to-end</div>
+    <h2>What happens when PM runs the skill</h2>
+    <div class="stages mt3" style="max-width:780px">
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
+        <div>
+          <div class="stage-title">Runs <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">/create-screen-spec "Cash Out Confirmation"</code></div>
+          <div class="stage-desc">Agent reads the initiative file and applies the PM's skill logic</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">🔌</div>
+        <div>
+          <div class="stage-title">Agent checks Figma via plugin</div>
+          <div class="stage-desc"><span style="color:var(--green)">✓ Confirmation button exists in design system</span><br/><span style="color:var(--yellow)">✗ Error state illustration missing — flagged for designer</span></div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">🔌</div>
+        <div>
+          <div class="stage-title">Agent creates Jira ticket + posts Slack message</div>
+          <div class="stage-desc">Ticket has the full spec attached. Slack: "Screen spec ready for DS review."</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">DS</div>
+        <div>
+          <div class="stage-title">Designer opens Jira, reads spec, adds missing illustration</div>
+          <div class="stage-desc">Writes <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">design/decisions/DDD-013-confirmation-errors.md</code> — commits to repo</div>
+        </div>
+      </div>
+    </div>
+    <p class="body-text mt3" style="color:var(--muted); font-size:0.9rem">
+      The skill gave every screen a consistent standard.<br/>
+      The plugins made the agent reach Figma, Jira, and Slack without anyone doing it manually.
+    </p>
+  </div>
+
+  <!-- 06 SECTION 1 -->
+  <div class="slide slide-title" data-index="3">
+    <div class="section-number">01</div>
+    <div class="tag tag-section">Part 1</div>
+    <h2>The basics</h2>
+    <p class="subtitle mt2">Directories · Projects · Repositories</p>
+  </div>
+
+  <!-- 05 DIRECTORY -->
+  <div class="slide slide-concept" data-index="4">
+    <div class="tag tag-section">Part 1 · Basics</div>
+    <h2>A directory is just a folder</h2>
+    <div class="code-block mt3"><span class="c-muted"># You already use these every day</span>
+
+<span class="c-green">📁 My Drive</span>
+  <span class="c-yellow">📁 Q1 Planning</span>
+    <span class="c-blue">📄 OKRs.doc</span>
+    <span class="c-blue">📄 Roadmap.xlsx</span>
+  <span class="c-yellow">📁 Research</span>
+    <span class="c-blue">📄 User interviews.doc</span></div>
+    <p class="body-text mt3">On your computer, in Google Drive, in Notion.<br/>A directory is just a container for files. Nothing more.</p>
+  </div>
+
+  <!-- 06 DIRECTORY TERMINAL -->
+  <div class="slide slide-concept" data-index="5">
+    <div class="tag tag-terminal">Terminal</div>
+    <h2>Creating directories in the terminal</h2>
+    <div class="terminal mt3">
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#ff5f57"></div>
+        <div class="terminal-dot" style="background:#febc2e"></div>
+        <div class="terminal-dot" style="background:#28c840"></div>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># Create a single directory</span>
+<span class="prompt">$ </span><span class="cmd">mkdir my-initiative</span>
+
+<span class="comment"># Create nested directories at once</span>
+<span class="prompt">$ </span><span class="cmd">mkdir -p product/initiatives/cash-out</span>
+
+<span class="comment"># See what's inside a directory</span>
+<span class="prompt">$ </span><span class="cmd">ls -la</span>
+<span class="out">drwxr-xr-x  product/
+drwxr-xr-x  design/
+drwxr-xr-x  docs/</span>
+
+<span class="comment"># Move into a directory</span>
+<span class="prompt">$ </span><span class="cmd">cd product/initiatives</span></div>
+    </div>
+    <p class="body-text mt3" style="color:var(--muted); font-size:0.9rem">The <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.85rem">-p</code> flag creates all parent folders automatically — no errors if they already exist.</p>
+  </div>
+
+  <!-- 07 PROJECT -->
+  <div class="slide slide-concept" data-index="6">
+    <div class="tag tag-section">Part 1 · Basics</div>
+    <h2>A project is a directory with purpose</h2>
+    <div class="code-block mt3"><span class="c-green">📁 cash-out-redeban/</span>
+  <span class="c-pink">📄 README.md</span>         <span class="c-muted">← "What this is"</span>
+  <span class="c-yellow">📄 initiative.md</span>    <span class="c-muted">← "Why we're building this"</span>
+  <span class="c-yellow">📄 metrics.md</span>       <span class="c-muted">← "How we measure success"</span>
+  <span class="c-blue">📁 research/</span>
+    <span class="c-blue">📄 user-interviews.md</span>
+  <span class="c-blue">📁 design/</span>
+    <span class="c-blue">📄 decisions.md</span></div>
+    <p class="body-text mt3">Think of it like a product brief folder — structured, purposeful, and understandable to anyone who opens it.</p>
+  </div>
+
+  <!-- 08 REPOSITORY -->
+  <div class="slide slide-concept" data-index="7">
+    <div class="tag tag-section">Part 1 · Basics</div>
+    <h2>A repository is a shared, versioned project</h2>
+    <table class="styled-table mt3">
+      <thead>
+        <tr><th>Google Drive</th><th>Repository</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:var(--text)">Anyone edits anytime</td><td style="color:var(--text)">Changes go through review</td></tr>
+        <tr><td style="color:var(--text)">Hard to track who changed what</td><td style="color:var(--text)">Every change has author + reason</td></tr>
+        <tr><td style="color:var(--text)">Files are siloed</td><td style="color:var(--text)">Everything is connected</td></tr>
+        <tr><td style="color:var(--text)">AI can't easily read it</td><td style="color:var(--green); font-weight:600">AI can read and act on it</td></tr>
+      </tbody>
+    </table>
+    <p class="body-text mt3">The repository is the <strong>single source of truth</strong> the whole squad syncs to — engineers, PMs, and designers alike.</p>
+  </div>
+
+  <!-- 09 DISCUSSION 1 -->
+  <div class="slide slide-discussion" data-index="8">
+    <div class="tag tag-discussion">Discussion · 3 min</div>
+    <div class="discussion-box mt2">
+      <div class="discussion-q">
+        "Think about the last initiative you worked on.<br/>
+        Where did the context live?<br/>
+        What happened to it after launch?"
+      </div>
+      <p class="discussion-hint">Let 2–3 people share. Guide toward: context was scattered, hard to find, and lost after the initiative ended.</p>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER SECTION DIVIDER -->
+  <div class="slide slide-title" data-index="9a">
+    <div class="section-number">→</div>
+    <div class="tag tag-section">End-to-end example</div>
+    <h2>PM + Designer<br/>working together</h2>
+    <p class="subtitle mt2">Launching a new feature: Loyalty Rewards<br/>How it works today vs. how it should work</p>
+  </div>
+
+  <!-- BEFORE SLIDE -->
+  <div class="slide slide-concept" data-index="9b">
+    <div class="tag tag-section" style="background:rgba(251,191,36,0.1);color:var(--yellow);border-color:rgba(251,191,36,0.3)">Today · How it works</div>
+    <h2>Loyalty Rewards — before</h2>
+    <div class="stages mt3" style="max-width:800px">
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">PM</div>
+        <div>
+          <div class="stage-title">Writes a brief in Confluence. Schedules a kickoff.</div>
+          <div class="stage-desc" style="color:var(--yellow)">⚠ Brief has no structure. Constraints are buried in paragraphs. Success metrics are vague.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">DS</div>
+        <div>
+          <div class="stage-title">Gets briefed in a meeting. Opens Figma, starts exploring.</div>
+          <div class="stage-desc" style="color:var(--yellow)">⚠ Design decisions live in Figma comments. No reasoning is written down.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(52,211,153,0.1);border-color:var(--green);color:var(--green)">ENG</div>
+        <div>
+          <div class="stage-title">Gets a Figma link + a Confluence link in Slack.</div>
+          <div class="stage-desc" style="color:var(--yellow)">⚠ Asks 12 questions over 3 Slack threads. Misses one constraint. Builds the wrong animation. Rework.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">🔁</div>
+        <div>
+          <div class="stage-title">More meetings, more iterations, delayed launch.</div>
+          <div class="stage-desc" style="color:var(--muted)">Context was in people's heads. Now it's lost.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER SLIDE -->
+  <div class="slide slide-concept" data-index="9c">
+    <div class="tag tag-section" style="background:rgba(52,211,153,0.1);color:var(--green);border-color:rgba(52,211,153,0.3)">New way · How it should work</div>
+    <h2>Loyalty Rewards — after</h2>
+    <div class="stages mt3" style="max-width:800px">
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
+        <div>
+          <div class="stage-title">Creates <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">product/initiatives/loyalty-rewards.md</code></div>
+          <div class="stage-desc">Problem, metrics, constraints, open questions — structured template. Committed to the repo.</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">DS</div>
+        <div>
+          <div class="stage-title">Creates <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">design/decisions/DDD-012-rewards-card.md</code></div>
+          <div class="stage-desc">Why a card over a modal. Animation spec. Constraints for engineers. Figma link. Committed.</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
+        <div>
+          <div class="stage-title">Runs <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">/write-user-stories</code> skill</div>
+          <div class="stage-desc">Agent reads the initiative file → generates user stories. PM reviews and commits them.</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num" style="background:rgba(52,211,153,0.1);border-color:var(--green);color:var(--green)">ENG</div>
+        <div>
+          <div class="stage-title">Reads both files. Asks zero questions. Opens first PR.</div>
+          <div class="stage-desc">Agent validates PR vs. initiative metrics and design constraints. Flags one gap. Engineer fixes it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEXT STRUCTURE SLIDE -->
+  <div class="slide slide-concept" data-index="9d">
+    <div class="tag tag-section">End-to-end example</div>
+    <h2>What the repository looks like</h2>
+    <div class="code-block mt3" style="max-width:760px"><span class="c-muted"># After PM and Designer contribute</span>
+
+<span class="c-green">📁 product/</span>
+  <span class="c-yellow">📁 initiatives/</span>
+    <span class="c-blue">📄 loyalty-rewards.md</span>      <span class="c-muted">← PM: problem, metrics, constraints</span>
+  <span class="c-yellow">📁 decisions/</span>
+    <span class="c-blue">📄 loyalty-no-expiry.md</span>    <span class="c-muted">← PM: why rewards don't expire</span>
+
+<span class="c-pink">📁 design/</span>
+  <span class="c-yellow">📁 decisions/</span>
+    <span class="c-blue">📄 DDD-012-rewards-card.md</span> <span class="c-muted">← Designer: card pattern + constraints</span>
+  <span class="c-yellow">📁 research/</span>
+    <span class="c-blue">📄 loyalty-interviews-q1.md</span> <span class="c-muted">← Designer: user research findings</span>
+
+<span class="c-muted">📁 src/</span>                            <span class="c-muted">← Engineers own this</span></div>
+    <p class="body-text mt3" style="color:var(--muted)">
+      One place. No Confluence links. No Slack threads. No "where's the brief?"<br/>
+      <strong style="color:var(--text)">Context lives next to the code — forever.</strong>
+    </p>
+  </div>
+
+  <!-- 10 SECTION 2 -->
+  <div class="slide slide-title" data-index="9">
+    <div class="section-number">02</div>
+    <div class="tag tag-section">Part 2</div>
+    <h2>What PMs contribute</h2>
+    <p class="subtitle mt2">Structured context that engineers and agents can use</p>
+  </div>
+
+  <!-- 11 INITIATIVE FILE -->
+  <div class="slide slide-concept" data-index="10">
+    <div class="tag tag-section">Part 2 · PMs</div>
+    <h2>The initiative file</h2>
+    <div class="code-block mt3"><span class="c-purple"># Cash Out via Redeban/D1</span>
+
+<span class="c-yellow">## Problem Statement</span>
+Users need to withdraw money from their digital wallet
+to cash at physical Redeban/D1 points.
+
+<span class="c-yellow">## Success Metrics</span>
+- 15% of eligible users complete first Cash Out in 30 days
+- Transaction success rate above 98%
+
+<span class="c-yellow">## Constraints</span>
+- Max withdrawal: $500,000 COP per transaction
+- Redeban API: 3s response time limit
+
+<span class="c-yellow">## Decisions Made</span>
+- <span class="c-green">2026-03-10:</span> Bottom sheet over modal — less disruptive
+- <span class="c-green">2026-03-14:</span> No fee for first 3 months — growth priority</div>
+  </div>
+
+  <!-- 12 PM TERMINAL WORKFLOW -->
+  <div class="slide slide-concept" data-index="11">
+    <div class="tag tag-terminal">Terminal · PM Workflow</div>
+    <h2>PMs in the terminal</h2>
+    <div class="terminal mt3">
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#ff5f57"></div>
+        <div class="terminal-dot" style="background:#febc2e"></div>
+        <div class="terminal-dot" style="background:#28c840"></div>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># Create your initiative file</span>
+<span class="prompt">$ </span><span class="cmd">mkdir -p product/initiatives</span>
+<span class="prompt">$ </span><span class="cmd">touch product/initiatives/cash-out-redeban.md</span>
+
+<span class="comment"># Open it in your editor</span>
+<span class="prompt">$ </span><span class="cmd">cursor product/initiatives/cash-out-redeban.md</span>
+
+<span class="comment"># Save your work to the shared repository</span>
+<span class="prompt">$ </span><span class="cmd">git add product/initiatives/cash-out-redeban.md</span>
+<span class="prompt">$ </span><span class="cmd">git commit -m "add cash-out initiative context"</span>
+<span class="prompt">$ </span><span class="cmd">git push</span>
+<span class="out">→ Your context is now visible to the entire squad</span></div>
+    </div>
+  </div>
+
+  <!-- 13 PM FLOW -->
+  <div class="slide slide-concept" data-index="12">
+    <div class="tag tag-section">Part 2 · PMs</div>
+    <h2>The PM contribution loop</h2>
+    <div class="stages mt3">
+      <div class="stage current">
+        <div class="stage-num">1</div>
+        <div>
+          <div class="stage-title">PM writes initiative file</div>
+          <div class="stage-desc">Problem, metrics, constraints, open questions — structured markdown</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">2</div>
+        <div>
+          <div class="stage-title">Engineer reads it before writing code</div>
+          <div class="stage-desc">No standup needed. No Slack thread. Context is there.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">3</div>
+        <div>
+          <div class="stage-title">Engineer has fewer questions → ships faster</div>
+          <div class="stage-desc">Constraints are known. Decisions are logged. Scope is clear.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">4</div>
+        <div>
+          <div class="stage-title">PM updates file when decisions change</div>
+          <div class="stage-desc">One update reaches everyone simultaneously</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 SKILLS AND AGENTS -->
+  <div class="slide slide-concept" data-index="13">
+    <div class="tag tag-section">Part 2 · PMs</div>
+    <h2>What structured context enables</h2>
+    <div class="cards mt3">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h4>Skill</h4>
+        <p>A reusable task an AI performs using your context.</p>
+        <p class="mt2" style="color:var(--text); font-size:0.85rem">Example: <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px">/write-user-stories</code> reads your initiative file and generates consistent user stories for any PM on the squad.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h4>Subagent</h4>
+        <p>An autonomous worker that monitors and acts without you present.</p>
+        <p class="mt2" style="color:var(--text); font-size:0.85rem">Example: <code style="background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px">initiative-validator</code> checks every Pull Request against your initiative file automatically.</p>
+      </div>
+    </div>
+    <p class="body-text mt3" style="color:var(--muted)">The PM's role evolves: write structured context once → agent handles first-pass validation → PM reviews exceptions, not everything.</p>
+  </div>
+
+  <!-- 15 DISCUSSION 2 -->
+  <div class="slide slide-discussion" data-index="14">
+    <div class="tag tag-discussion">Discussion · 4 min</div>
+    <div class="discussion-box mt2">
+      <div class="discussion-q">
+        "If you had to write down everything an engineer needs to know
+        about your current initiative — no meetings, no Slack —
+        what would you include? What would be hard to write down?"
+      </div>
+      <p class="discussion-hint">The hard parts are usually the <em>why</em> and the constraints — exactly what's most valuable to engineers and agents.</p>
+    </div>
+  </div>
+
+  <!-- 16 SECTION 3 -->
+  <div class="slide slide-title" data-index="15">
+    <div class="section-number">03</div>
+    <div class="tag tag-section">Part 3</div>
+    <h2>What Designers contribute</h2>
+    <p class="subtitle mt2">Experience logic that prevents rework</p>
+  </div>
+
+  <!-- 17 DESIGNER PROBLEM -->
+  <div class="slide slide-concept" data-index="16">
+    <div class="tag tag-section">Part 3 · Designers</div>
+    <h2>The designer's unique asset</h2>
+    <p class="large-quote mt3">
+      "An engineer looks at a Figma file and sees <em>what</em> to build.<br/>
+      They rarely see <em>why</em> that decision was made.<br/>
+      So they make assumptions — and those assumptions cause rework."
+    </p>
+    <div class="cards mt3">
+      <div class="card">
+        <h4>Where it lives today</h4>
+        <p>Figma comments, meeting notes, Slack threads, people's heads</p>
+      </div>
+      <div class="card">
+        <h4>Where it should live</h4>
+        <p>A Design Decision Document (DDD) in the repository, next to the PM context</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18 DDD -->
+  <div class="slide slide-concept" data-index="17">
+    <div class="tag tag-section">Part 3 · Designers</div>
+    <h2>The Design Decision Document</h2>
+    <div class="code-block mt3"><span class="c-purple"># DDD-001: Bottom Sheet over Modal for Cash Out</span>
+
+<span class="c-yellow">## Decision</span>
+Use a bottom sheet instead of a full modal.
+
+<span class="c-yellow">## Reasoning</span>
+- Tested with 8 users — modal felt abrupt and disorienting
+- Bottom sheet keeps background visible, reducing anxiety
+
+<span class="c-yellow">## Constraints for Engineers</span>
+- Sheet must not exceed 60% of screen height
+- Dismiss on tap outside must always be enabled
+- Animation: slide up 300ms ease-out
+
+<span class="c-yellow">## What breaks if this is ignored</span>
+<span class="c-pink">Inconsistent experience → drop-off at confirmation step</span></div>
+  </div>
+
+  <!-- 19 DESIGNER TERMINAL -->
+  <div class="slide slide-concept" data-index="18">
+    <div class="tag tag-terminal">Terminal · Designer Workflow</div>
+    <h2>Designers in the terminal</h2>
+    <div class="terminal mt3">
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#ff5f57"></div>
+        <div class="terminal-dot" style="background:#febc2e"></div>
+        <div class="terminal-dot" style="background:#28c840"></div>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># Create your design decisions folder</span>
+<span class="prompt">$ </span><span class="cmd">mkdir -p design/decisions</span>
+<span class="prompt">$ </span><span class="cmd">touch design/decisions/DDD-001-bottom-sheet.md</span>
+
+<span class="comment"># Also add UX constraints to the PM's initiative file</span>
+<span class="prompt">$ </span><span class="cmd">cursor product/initiatives/cash-out-redeban.md</span>
+
+<span class="comment"># Commit both together — they belong to the same feature</span>
+<span class="prompt">$ </span><span class="cmd">git add design/ product/</span>
+<span class="prompt">$ </span><span class="cmd">git commit -m "add UX constraints for cash-out flow"</span>
+<span class="prompt">$ </span><span class="cmd">git push</span></div>
+    </div>
+  </div>
+
+  <!-- 20 DISCUSSION 3 -->
+  <div class="slide slide-discussion" data-index="19">
+    <div class="tag tag-discussion">Discussion · 3 min</div>
+    <div class="discussion-box mt2">
+      <div class="discussion-q">
+        "Think of a design decision you've made in the last month.
+        Is that reasoning written down anywhere?
+        What would happen if a new engineer joined tomorrow
+        and had to implement that same feature?"
+      </div>
+      <p class="discussion-hint">Most design reasoning lives only in people's heads. That's the gap this practice fills.</p>
+    </div>
+  </div>
+
+  <!-- 21 SECTION 4 -->
+  <div class="slide slide-title" data-index="20">
+    <div class="section-number">04</div>
+    <div class="tag tag-section">Part 4</div>
+    <h2>The agentic squad</h2>
+    <p class="subtitle mt2">What becomes possible when context is structured</p>
+  </div>
+
+  <!-- 22 PROGRESSION -->
+  <div class="slide slide-concept" data-index="21">
+    <div class="tag tag-section">Part 4 · Agentic</div>
+    <h2>The progression</h2>
+    <div class="stages mt3">
+      <div class="stage">
+        <div class="stage-num">1</div>
+        <div>
+          <div class="stage-title">Scattered context</div>
+          <div class="stage-desc">Confluence, Figma, Slack, people's heads. Engineers ask questions → repeat.</div>
+        </div>
+      </div>
+      <div class="stage current">
+        <div class="stage-num">2</div>
+        <div>
+          <div class="stage-title">Structured context — where we're going</div>
+          <div class="stage-desc">Markdown files in the repo. PMs and Designers contribute alongside engineers.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">3</div>
+        <div>
+          <div class="stage-title">Agentic development</div>
+          <div class="stage-desc">Agents read context, generate drafts, validate PRs. PMs review exceptions only.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">4</div>
+        <div>
+          <div class="stage-title">Continuous learning</div>
+          <div class="stage-desc">Agent outputs improve context quality. The squad gets smarter automatically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 23 DAY IN THE LIFE -->
+  <div class="slide slide-concept" data-index="22">
+    <div class="tag tag-section">Part 4 · Agentic</div>
+    <h2>A Monday in an agentic squad</h2>
+    <div class="stages mt3">
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
+        <div>
+          <div class="stage-title">Writes <code style="font-size:0.85rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">product/initiatives/loyalty-rewards.md</code></div>
+          <div class="stage-desc">Problem, metrics, constraints, open questions</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">DS</div>
+        <div>
+          <div class="stage-title">Writes <code style="font-size:0.85rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">design/decisions/DDD-007-rewards-card.md</code></div>
+          <div class="stage-desc">Interaction pattern, visual constraints, Figma link</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(52,211,153,0.1);border-color:var(--green);color:var(--green)">ENG</div>
+        <div>
+          <div class="stage-title">Reads both files, opens first PR</div>
+          <div class="stage-desc">Agent runs: checks metrics alignment ✓ · checks design constraints ✓ · flags: "transaction limit not handled" ✗</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(251,191,36,0.1);border-color:var(--yellow);color:var(--yellow)">🤖</div>
+        <div>
+          <div class="stage-title">Friday: agent summary delivered to PM and Designer</div>
+          <div class="stage-desc">30 minutes of review instead of 3 hours. No standup about it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24 DISCUSSION 4 -->
+  <div class="slide slide-discussion" data-index="23">
+    <div class="tag tag-discussion">Discussion · 3 min</div>
+    <div class="discussion-box mt2">
+      <div class="discussion-q">
+        "What's one thing you worked on last quarter
+        that you wish the whole team had understood better?
+        Could that have been written down as a file in a repository?"
+      </div>
+      <p class="discussion-hint">Anchor this to real examples from the group. The more concrete, the more convincing.</p>
+    </div>
+  </div>
+
+  <!-- 25 SUMMARY -->
+  <div class="slide slide-concept" data-index="24">
+    <div class="tag tag-section">Summary</div>
+    <h2>The full picture</h2>
+    <table class="styled-table mt3">
+      <thead>
+        <tr><th>Concept</th><th>What it is</th><th>Who owns it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Directory</td><td style="color:var(--text)">A folder</td><td style="color:var(--muted)">Everyone</td></tr>
+        <tr><td>Project</td><td style="color:var(--text)">A folder with purpose</td><td style="color:var(--muted)">Team</td></tr>
+        <tr><td>Repository</td><td style="color:var(--text)">Shared, versioned project</td><td style="color:var(--muted)">Team + cloud</td></tr>
+        <tr><td>Initiative file</td><td style="color:var(--text)">Structured PM context</td><td style="color:var(--accent2)">PMs</td></tr>
+        <tr><td>Design Decision Doc</td><td style="color:var(--text)">Structured designer context</td><td style="color:var(--pink)">Designers</td></tr>
+        <tr><td>Skill</td><td style="color:var(--text)">Reusable AI task</td><td style="color:var(--muted)">PM or Designer</td></tr>
+        <tr><td>Agent</td><td style="color:var(--text)">Autonomous AI worker</td><td style="color:var(--muted)">Engineers build · PMs define the goal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 26 ACTIONS -->
+  <div class="slide slide-action" data-index="25">
+    <div class="tag tag-action">This week</div>
+    <h2>Your first steps</h2>
+    <div class="cards mt3" style="max-width:760px; align-items:flex-start">
+      <div class="card">
+        <h4 style="color:var(--accent2)">For PMs</h4>
+        <ul class="action-list">
+          <li><div class="check"></div>Pick one active initiative</li>
+          <li><div class="check"></div>Write it as a markdown file using the template</li>
+          <li><div class="check"></div>Ask an engineer: "Would this have saved you questions?"</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--pink)">For Designers</h4>
+        <ul class="action-list">
+          <li><div class="check"></div>Pick one recent design decision</li>
+          <li><div class="check"></div>Write it as a DDD</li>
+          <li><div class="check"></div>Add UX constraints to one PM initiative file</li>
+        </ul>
+      </div>
+    </div>
+    <div class="terminal mt3" style="max-width:760px">
+      <div class="terminal-header">
+        <div class="terminal-dot" style="background:#ff5f57"></div>
+        <div class="terminal-dot" style="background:#febc2e"></div>
+        <div class="terminal-dot" style="background:#28c840"></div>
+      </div>
+      <div class="terminal-body">
+<span class="comment"># Everyone: get access to the repository</span>
+<span class="prompt">$ </span><span class="cmd">git clone https://github.com/your-squad/repo.git</span>
+<span class="prompt">$ </span><span class="cmd">cd repo</span>
+<span class="prompt">$ </span><span class="cmd">ls</span>
+<span class="out">product/  design/  docs/  src/</span></div>
+    </div>
+  </div>
+
+  <!-- 27 CLOSING -->
+  <div class="slide slide-title" data-index="26">
+    <div class="tag tag-section">Closing</div>
+    <p class="large-quote" style="max-width:720px; font-size:1.6rem">
+      "You don't need to learn to code.<br/>
+      You need to learn to write context<br/>
+      that a machine can read.<br/><br/>
+      You already know how to write.<br/>
+      The only thing changing is where you put it —<br/>
+      and what becomes possible when you do."
+    </p>
+    <p class="subtitle mt3" style="font-size:0.9rem">Next session: Hands-on — creating your first initiative file</p>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div id="nav">
+  <button id="prev-btn" onclick="navigate(-1)" disabled>←</button>
+  <span id="slide-counter">1 / 27</span>
+  <button id="next-btn" onclick="navigate(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function navigate(dir) {
+    const next = current + dir;
+    if (next < 0 || next >= total) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current - dir].classList.remove('exit'), 400);
+    current = next;
+    slides[current].classList.add('active');
+    update();
+  }
+
+  function update() {
+    document.getElementById('slide-counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === total - 1;
+    const pct = ((current) / (total - 1)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+  });
+
+  update();
+</script>
+</body>
+</html>
