@@ -585,20 +585,20 @@
       <div class="card" style="min-width:200px">
         <div class="card-icon">⚡</div>
         <h4>Skill</h4>
-        <p>A reusable workflow you define. Like a playbook — encode how something should always be done, then anyone can invoke it.</p>
+        <p>Uma receita reutilizável. Encodes exactly how a task should always be done — anyone can invoke it with one command.</p>
         <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: <code style="background:var(--code-bg);padding:0 0.3rem;border-radius:3px;font-size:0.78rem">/write-user-stories</code> reads your initiative and generates consistent stories every time.</p>
       </div>
       <div class="card" style="min-width:200px">
         <div class="card-icon">🔌</div>
         <h4>Plugin</h4>
-        <p>An integration that connects the agent to external systems — Jira, Slack, GitHub, Figma, Confluence.</p>
-        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: A Jira plugin lets the agent create tickets directly from your initiative file, no manual input needed.</p>
+        <p>A bundle of skills, hooks, and agents packaged together. Extends what the agent can do — tools, integrations, and logic in one place.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">Example: A Figma plugin bundles the skills and hooks needed to read components, check the design system, and flag gaps.</p>
       </div>
       <div class="card" style="min-width:200px; border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.07)">
         <div class="card-icon">🤖</div>
         <h4 style="color:var(--accent2)">Agent</h4>
-        <p>The whole system in action — a model using tools, running skills, and calling plugins to complete a goal autonomously. <strong style="color:var(--text)">Built by engineers.</strong></p>
-        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">PMs and Designers don't build agents — they write the skills and context that make agents useful.</p>
+        <p>Uma automação que mantém o próprio contexto. Uses skills, hooks, and plugins to complete goals autonomously — without needing to be guided step by step.</p>
+        <p class="mt2" style="font-size:0.8rem; color:var(--accent2)">PMs and Designers write the skills and context that make agents useful.</p>
       </div>
     </div>
   </div>
@@ -610,10 +610,10 @@
     <div class="code-block mt3" style="max-width:800px"><span class="c-muted">Who owns it?</span>
 
 <span class="c-green">  PM / Designer</span>  →  write context: initiative files, design decisions
-<span class="c-green">  PM / Designer</span>  →  build <span class="c-green">Skills</span>: reusable prompts that encode their thinking
+<span class="c-green">  PM / Designer</span>  →  write <span class="c-green">Skills</span>: receitas that encode how tasks should be done
 <span class="c-pink">       Engineer</span>  →  configure <span class="c-yellow">Tools</span>: read file, run command, check PR
-<span class="c-pink">       Engineer</span>  →  wire <span class="c-pink">Plugins</span>: Jira, Slack, GitHub, Figma
-<span class="c-purple">       Engineer</span>  →  build the <span class="c-purple">Agent</span>: assembles model + tools + skills + plugins
+<span class="c-pink">       Engineer</span>  →  build <span class="c-pink">Plugins</span>: bundle skills + hooks + agents into one extension
+<span class="c-purple">       Engineer</span>  →  build the <span class="c-purple">Agent</span>: maintains its own context, uses skills + hooks
 <span class="c-muted">           All</span>  →  review output and improve context over time</div>
     <p class="body-text mt3" style="color:var(--muted)">
       PMs and Designers own the <strong style="color:var(--green)">context and skills</strong> —
@@ -624,21 +624,31 @@
 
   <!-- PLUGIN VS SKILL: DISTINCTION -->
   <div class="slide slide-concept" data-index="5a">
-    <div class="tag tag-section">Plugin vs Skill</div>
-    <h2>One sentence difference</h2>
-    <p class="large-quote mt3" style="font-size:1.35rem">
-      The <strong style="color:var(--green)">skill</strong> tells the agent <em>what to think.</em><br/>
-      The <strong style="color:var(--pink)">plugin</strong> tells the agent <em>where to go.</em>
-    </p>
-    <table class="styled-table mt3">
-      <thead><tr><th></th><th>Skill</th><th>Plugin</th></tr></thead>
-      <tbody>
-        <tr><td>What it is</td><td style="color:var(--text)">Logic the PM or Designer writes</td><td style="color:var(--text)">A door to an external system</td></tr>
-        <tr><td>Who creates it</td><td style="color:var(--green)">PM or Designer</td><td style="color:var(--muted)">Engineer</td></tr>
-        <tr><td>What it answers</td><td style="color:var(--text)"><em>What should this output contain?</em></td><td style="color:var(--text)"><em>Where does the agent go to act?</em></td></tr>
-        <tr><td>Without it</td><td style="color:var(--yellow)">Agent produces generic, inconsistent output</td><td style="color:var(--yellow)">Agent can't reach Figma, Jira, or Slack</td></tr>
-      </tbody>
-    </table>
+    <div class="tag tag-section">Skill vs Plugin vs Agent</div>
+    <h2>One sentence each</h2>
+    <div class="stages mt3" style="max-width:720px">
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.4);color:var(--green);">⚡</div>
+        <div>
+          <div class="stage-title" style="color:var(--green)">Skill = receita</div>
+          <div class="stage-desc">A named, reusable recipe that tells the agent exactly how to do one task. Written by PMs and Designers. Invoked with a command like <code style="background:var(--code-bg);padding:0 0.3rem;border-radius:3px">/write-user-stories</code>.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(244,114,182,0.1);border-color:rgba(244,114,182,0.4);color:var(--pink);">🔌</div>
+        <div>
+          <div class="stage-title" style="color:var(--pink)">Plugin = bundle</div>
+          <div class="stage-desc">A packaged extension that bundles skills, hooks, and agents together. Engineers build plugins so that capabilities can be added and shared as one unit — like a Figma plugin or a Jira plugin.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2);">🤖</div>
+        <div>
+          <div class="stage-title" style="color:var(--accent2)">Agent = automação com contexto próprio</div>
+          <div class="stage-desc">An automation that maintains its own context across steps. Uses skills, hooks, and plugins to reach a goal — without needing to be guided at each step.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- PLUGIN VS SKILL: SCREEN EXAMPLE -->
@@ -664,14 +674,14 @@
       </div>
       <div class="card">
         <div class="card-icon">🔌</div>
-        <h4 style="color:var(--pink)">Plugins — configured by engineers</h4>
-        <p style="margin-bottom:0.75rem">Give the agent access to external systems:</p>
+        <h4 style="color:var(--pink)">Plugins — bundles built by engineers</h4>
+        <p style="margin-bottom:0.75rem">Each plugin bundles the skills, hooks, and tools for a system:</p>
         <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.9rem;font-family:'SF Mono',monospace;font-size:0.78rem;line-height:1.9;color:var(--muted)">
-          <span style="color:var(--pink)">Figma plugin</span>  → read component library<br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;check what already exists<br/><br/>
-          <span style="color:var(--pink)">Jira plugin</span>&nbsp;&nbsp;&nbsp;→ create engineering ticket<br/>
+          <span style="color:var(--pink)">Figma plugin</span>  → skills: read components,<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hooks: flag missing assets<br/><br/>
+          <span style="color:var(--pink)">Jira plugin</span>&nbsp;&nbsp;&nbsp;→ skills: create ticket,<br/>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attach spec automatically<br/><br/>
-          <span style="color:var(--pink)">Slack plugin</span>&nbsp;&nbsp;→ notify designer when ready
+          <span style="color:var(--pink)">Slack plugin</span>&nbsp;&nbsp;→ skills: notify, hooks: on PR open
         </div>
       </div>
     </div>
@@ -1244,8 +1254,9 @@ Use a bottom sheet instead of a full modal.
         <tr><td>Repository</td><td style="color:var(--text)">Shared, versioned project</td><td style="color:var(--muted)">Team + cloud</td></tr>
         <tr><td>Initiative file</td><td style="color:var(--text)">Structured PM context</td><td style="color:var(--accent2)">PMs</td></tr>
         <tr><td>Design Decision Doc</td><td style="color:var(--text)">Structured designer context</td><td style="color:var(--pink)">Designers</td></tr>
-        <tr><td>Skill</td><td style="color:var(--text)">Reusable AI task</td><td style="color:var(--muted)">PM or Designer</td></tr>
-        <tr><td>Agent</td><td style="color:var(--text)">Autonomous AI worker</td><td style="color:var(--muted)">Engineers build · PMs define the goal</td></tr>
+        <tr><td>Skill</td><td style="color:var(--text)">Receita — reusable named task</td><td style="color:var(--muted)">PM or Designer</td></tr>
+        <tr><td>Plugin</td><td style="color:var(--text)">Bundle of skills, hooks &amp; agents</td><td style="color:var(--muted)">Engineer</td></tr>
+        <tr><td>Agent</td><td style="color:var(--text)">Automation that maintains its own context</td><td style="color:var(--muted)">Engineers build · PMs write its skills</td></tr>
       </tbody>
     </table>
   </div>
