@@ -651,79 +651,87 @@
     </div>
   </div>
 
-  <!-- PLUGIN VS SKILL: SCREEN EXAMPLE -->
+  <!-- PM EXAMPLE: PREPARING FOR PLANNING — SKILLS & PLUGINS -->
   <div class="slide slide-concept" data-index="5b">
-    <div class="tag tag-section">Plugin vs Skill · Example</div>
-    <h2>Creating the Cash Out Confirmation screen</h2>
-    <div class="cards mt3" style="align-items:flex-start">
+    <div class="tag tag-section">PM Activity · Example</div>
+    <h2>Preparing for planning</h2>
+    <p class="subtitle" style="font-size:0.9rem; margin-bottom:1.2rem;">Today: review Jira, check the roadmap spreadsheet, look at estimates, build two slides — one for the team, one for stakeholders.</p>
+    <div class="cards mt2" style="align-items:flex-start; max-width:960px; gap:0.75rem;">
       <div class="card">
         <div class="card-icon">⚡</div>
-        <h4 style="color:var(--green)">Skill — written by the PM</h4>
-        <p style="margin-bottom:0.75rem">Encodes what every screen spec must contain:</p>
-        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.9rem;font-family:'SF Mono',monospace;font-size:0.78rem;line-height:1.7;color:var(--muted)">
-          <span style="color:var(--green)">/create-screen-spec</span><br/><br/>
-          Given an initiative file + screen name:<br/>
-          1. User goal on this screen<br/>
-          2. Entry points<br/>
-          3. Happy path<br/>
-          4. <span style="color:var(--yellow)">Error states — list all</span><br/>
-          5. Edge cases (offline, timeout)<br/>
-          6. Acceptance criteria<br/>
-          7. Open questions for designer
+        <h4 style="color:var(--green)">Skills — written by the PM</h4>
+        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.85rem;font-family:'SF Mono',monospace;font-size:0.76rem;line-height:1.85;color:var(--muted); margin-top:0.6rem;">
+          <span style="color:var(--green)">/planning-digest</span><br/>
+          <span style="color:#3e3e5e">→</span> what's ready · what's blocked · what needs estimate<br/><br/>
+          <span style="color:var(--green)">/flag-unestimated</span><br/>
+          <span style="color:#3e3e5e">→</span> list all stories missing estimates or ACs<br/><br/>
+          <span style="color:var(--green)">/roadmap-vs-jira-diff</span><br/>
+          <span style="color:#3e3e5e">→</span> what's on the roadmap but has no stories yet<br/><br/>
+          <span style="color:var(--green)">/create-team-slide</span><br/>
+          <span style="color:#3e3e5e">→</span> digest → slide with dependencies + risks<br/><br/>
+          <span style="color:var(--green)">/create-stakeholder-slide</span><br/>
+          <span style="color:#3e3e5e">→</span> same digest → outcomes only, no technical detail
         </div>
       </div>
       <div class="card">
         <div class="card-icon">🔌</div>
         <h4 style="color:var(--pink)">Plugins — bundles built by engineers</h4>
-        <p style="margin-bottom:0.75rem">Each plugin bundles the skills, hooks, and tools for a system:</p>
-        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.9rem;font-family:'SF Mono',monospace;font-size:0.78rem;line-height:1.9;color:var(--muted)">
-          <span style="color:var(--pink)">Figma plugin</span>  → skills: read components,<br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hooks: flag missing assets<br/><br/>
-          <span style="color:var(--pink)">Jira plugin</span>&nbsp;&nbsp;&nbsp;→ skills: create ticket,<br/>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;attach spec automatically<br/><br/>
-          <span style="color:var(--pink)">Slack plugin</span>&nbsp;&nbsp;→ skills: notify, hooks: on PR open
+        <div style="background:var(--code-bg);border-radius:0.5rem;padding:0.85rem;font-family:'SF Mono',monospace;font-size:0.76rem;line-height:1.85;color:var(--muted); margin-top:0.6rem;">
+          <span style="color:var(--pink)">Jira plugin</span><br/>
+          <span style="color:#3e3e5e">→</span> skills: read epics, check estimates, list stories<br/>
+          <span style="color:#3e3e5e">→</span> hook: before planning, auto-run /flag-unestimated<br/><br/>
+          <span style="color:var(--pink)">Roadmap plugin</span><br/>
+          <span style="color:#3e3e5e">→</span> skills: read spreadsheet, run roadmap diff<br/>
+          <span style="color:#3e3e5e">→</span> hook: weekly, flag anything that drifted<br/><br/>
+          <span style="color:var(--pink)">Slides plugin</span><br/>
+          <span style="color:#3e3e5e">→</span> skills: generate slide per audience (team / stakeholder)<br/>
+          <span style="color:#3e3e5e">→</span> push directly to Google Slides or Notion
         </div>
       </div>
     </div>
   </div>
 
-  <!-- PLUGIN VS SKILL: END-TO-END FLOW -->
+  <!-- PM EXAMPLE: PREPARING FOR PLANNING — END-TO-END -->
   <div class="slide slide-concept" data-index="5c">
-    <div class="tag tag-section">Plugin vs Skill · End-to-end</div>
-    <h2>What happens when PM runs the skill</h2>
+    <div class="tag tag-section">PM Activity · End-to-end</div>
+    <h2>PM runs one command</h2>
     <div class="stages mt3" style="max-width:780px">
       <div class="stage current">
         <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
         <div>
-          <div class="stage-title">Runs <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">/create-screen-spec "Cash Out Confirmation"</code></div>
-          <div class="stage-desc">Agent reads the initiative file and applies the PM's skill logic</div>
+          <div class="stage-title">Runs <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">/prepare-for-planning</code></div>
+          <div class="stage-desc">The agent starts. It knows where to look — Jira, the roadmap file, the initiative files in the repo.</div>
         </div>
       </div>
-      <div class="stage current">
+      <div class="stage">
         <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">🔌</div>
         <div>
-          <div class="stage-title">Agent checks Figma via plugin</div>
-          <div class="stage-desc"><span style="color:var(--green)">✓ Confirmation button exists in design system</span><br/><span style="color:var(--yellow)">✗ Error state illustration missing — flagged for designer</span></div>
+          <div class="stage-title">Agent reads Jira + roadmap via plugins</div>
+          <div class="stage-desc">
+            <span style="color:var(--yellow)">✗ 3 stories missing estimates</span><br/>
+            <span style="color:var(--yellow)">✗ "Loyalty Rewards" on roadmap — no stories in Jira yet</span><br/>
+            <span style="color:var(--green)">✓ Cash Out initiative: 8 stories, all estimated, 2 blocked</span>
+          </div>
         </div>
       </div>
-      <div class="stage current">
+      <div class="stage">
         <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">🔌</div>
         <div>
-          <div class="stage-title">Agent creates Jira ticket + posts Slack message</div>
-          <div class="stage-desc">Ticket has the full spec attached. Slack: "Screen spec ready for DS review."</div>
+          <div class="stage-title">Generates both slides via Slides plugin</div>
+          <div class="stage-desc">Team slide: blockers, dependencies, open questions. Stakeholder slide: delivery outcomes, no technical detail. Both pushed to Google Slides.</div>
         </div>
       </div>
-      <div class="stage current">
-        <div class="stage-num" style="background:rgba(244,114,182,0.15);border-color:var(--pink);color:var(--pink)">DS</div>
+      <div class="stage">
+        <div class="stage-num" style="background:rgba(124,106,247,0.2);border-color:var(--accent);color:var(--accent2)">PM</div>
         <div>
-          <div class="stage-title">Designer opens Jira, reads spec, adds missing illustration</div>
-          <div class="stage-desc">Writes <code style="font-size:0.82rem;background:var(--code-bg);padding:0 0.3rem;border-radius:3px">design/decisions/DDD-013-confirmation-errors.md</code> — commits to repo</div>
+          <div class="stage-title">Reviews exceptions, walks into planning</div>
+          <div class="stage-desc">The mechanical prep is gone. The PM spends time on the 3 unestimated stories — not on assembling slides.</div>
         </div>
       </div>
     </div>
-    <p class="body-text mt3" style="color:var(--muted); font-size:0.9rem">
-      The skill gave every screen a consistent standard.<br/>
-      The plugins made the agent reach Figma, Jira, and Slack without anyone doing it manually.
+    <p class="body-text mt3" style="color:var(--muted); font-size:0.9rem;">
+      The skills encode the PM's logic for what "ready for planning" means.<br/>
+      The plugins give the agent access to Jira, the roadmap, and Slides — without manual steps.
     </p>
   </div>
 
