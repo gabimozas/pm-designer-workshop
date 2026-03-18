@@ -392,8 +392,98 @@
 
 <div id="slides">
 
-  <!-- 01 TITLE -->
-  <div class="slide slide-title active" data-index="0">
+  <!-- 01 CD FACTORY VS SPOTIFY -->
+  <div class="slide slide-title active" data-index="0" style="padding: 2rem 4rem 5rem;">
+    <div style="width:100%; max-width:1000px; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+      <div style="width:100%; display:flex; align-items:stretch; gap:0; position:relative;">
+        <!-- Left: CD Factory -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:1rem;">
+          <div style="font-size:1.1rem; font-weight:600; color:#9090a0;">💿 Improve the CD factory</div>
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; justify-content:center;">
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #2e2e3e; border-radius:0.4rem; padding:0.35rem 0.65rem; font-size:0.78rem; color:#7070a0;">📝 Brief</div>
+            <span style="color:#3e3e5e; font-size:0.9rem;">→</span>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #2e2e3e; border-radius:0.4rem; padding:0.35rem 0.65rem; font-size:0.78rem; color:#7070a0;">🗣 Meeting</div>
+            <span style="color:#3e3e5e; font-size:0.9rem;">→</span>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #2e2e3e; border-radius:0.4rem; padding:0.35rem 0.65rem; font-size:0.78rem; color:#7070a0;">🎨 Figma</div>
+            <span style="color:#3e3e5e; font-size:0.9rem;">→</span>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #2e2e3e; border-radius:0.4rem; padding:0.35rem 0.65rem; font-size:0.78rem; color:#7070a0;">💬 Slack</div>
+            <span style="color:#3e3e5e; font-size:0.9rem;">→</span>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #2e2e3e; border-radius:0.4rem; padding:0.35rem 0.65rem; font-size:0.78rem; color:#7070a0;">💻 Code</div>
+          </div>
+          <div style="font-size:0.8rem; color:#505070; font-style:italic;">Optimize each step. Ship faster. Same model.</div>
+        </div>
+
+        <!-- Center VS -->
+        <div style="display:flex; align-items:center; justify-content:center; padding:0 1.2rem; flex-shrink:0;">
+          <span style="font-size:2rem; font-weight:800; color:#2e2e4a; letter-spacing:-0.02em;">vs</span>
+        </div>
+
+        <!-- Right: Create Spotify -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:1rem; padding:1.5rem; background:rgba(124,106,247,0.05); border:1px solid rgba(124,106,247,0.2); border-radius:1rem;">
+          <div style="font-size:1.1rem; font-weight:600; color:var(--accent2);">🎵 Create Spotify</div>
+          <!-- Hub and spoke -->
+          <div style="position:relative; width:180px; height:180px; flex-shrink:0;">
+            <!-- Center node -->
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(124,106,247,0.2); border:2px solid var(--accent); border-radius:50%; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:var(--accent2); box-shadow:0 0 20px rgba(124,106,247,0.3); z-index:2;">🤖<br/><span style="font-size:0.6rem;">Agent</span></div>
+            <!-- Spoke lines using pseudo via inline border trick -->
+            <!-- Top node -->
+            <div style="position:absolute; top:4px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid rgba(124,106,247,0.3); border-radius:0.3rem; padding:0.2rem 0.4rem; font-size:0.68rem; color:var(--accent2); white-space:nowrap;">📄 Context</div>
+            <div style="position:absolute; top:38px; left:50%; transform:translateX(-50%); width:1px; height:22px; background:rgba(124,106,247,0.25);"></div>
+            <!-- Bottom node -->
+            <div style="position:absolute; bottom:4px; left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid rgba(124,106,247,0.3); border-radius:0.3rem; padding:0.2rem 0.4rem; font-size:0.68rem; color:var(--accent2); white-space:nowrap;">🚀 Deploy</div>
+            <div style="position:absolute; bottom:38px; left:50%; transform:translateX(-50%); width:1px; height:22px; background:rgba(124,106,247,0.25);"></div>
+            <!-- Left node -->
+            <div style="position:absolute; top:50%; left:0; transform:translateY(-50%); background:var(--surface); border:1px solid rgba(124,106,247,0.3); border-radius:0.3rem; padding:0.2rem 0.4rem; font-size:0.68rem; color:var(--accent2); white-space:nowrap;">🎨 Design</div>
+            <div style="position:absolute; top:50%; left:56px; transform:translateY(-50%); width:22px; height:1px; background:rgba(124,106,247,0.25);"></div>
+            <!-- Right node -->
+            <div style="position:absolute; top:50%; right:0; transform:translateY(-50%); background:var(--surface); border:1px solid rgba(124,106,247,0.3); border-radius:0.3rem; padding:0.2rem 0.4rem; font-size:0.68rem; color:var(--accent2); white-space:nowrap;">🔁 Feedback</div>
+            <div style="position:absolute; top:50%; right:74px; transform:translateY(-50%); width:22px; height:1px; background:rgba(124,106,247,0.25);"></div>
+            <!-- Bottom-right diagonal node -->
+            <div style="position:absolute; bottom:24px; right:2px; background:var(--surface); border:1px solid rgba(124,106,247,0.3); border-radius:0.3rem; padding:0.2rem 0.4rem; font-size:0.68rem; color:var(--accent2); white-space:nowrap;">💻 Code</div>
+          </div>
+          <div style="font-size:0.8rem; color:var(--muted); font-style:italic;">Reimagine how everything connects.</div>
+        </div>
+      </div>
+
+      <!-- Bottom quote -->
+      <div class="large-quote" style="margin-top:0.5rem;">
+        "It's not about doing the same things faster. It's about changing how the parts work — and how they're connected."
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 WHAT THIS MEANS IN PRACTICE -->
+  <div class="slide slide-concept" data-index="1">
+    <div class="tag tag-section">Framing</div>
+    <h2>What this means in practice</h2>
+    <div class="stages mt3" style="max-width:720px;">
+      <div class="stage">
+        <div class="stage-num">⚡</div>
+        <div>
+          <div class="stage-title">Improve the parts</div>
+          <div class="stage-desc">Speed up individual tasks — write briefs faster, generate user stories, check Figma components.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">🔗</div>
+        <div>
+          <div class="stage-title">Revisit how parts are connected</div>
+          <div class="stage-desc">Context flows automatically between PM, Designer, and Engineer. No Slack threads. No lost decisions.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-num">🔄</div>
+        <div>
+          <div class="stage-title">Change how some parts work entirely</div>
+          <div class="stage-desc">Some steps don't get faster — they disappear. An agent validates PRs. A skill generates specs. The loop closes itself.</div>
+        </div>
+      </div>
+    </div>
+    <p class="subtitle mt3" style="font-size:0.95rem;">This is the full agentic loop. The rest of this session shows you how to be part of it.</p>
+  </div>
+
+  <!-- 03 TITLE -->
+  <div class="slide slide-title" data-index="2">
     <div class="tag tag-section">Squad Workshop · 2026</div>
     <h1>From Files<br/>to Agents</h1>
     <p class="subtitle mt2">How PMs and Designers shape product development<br/>through structured context in shared repositories</p>
